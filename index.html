@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pol — Persian-language telehealth</title>
+<link rel="canonical" href="https://polvisit.com/">
+<meta property="og:title" content="Pol — Persian-language telehealth">
+<meta property="og:description" content="Book a video visit with Farsi-speaking doctors, from anywhere in Canada, through Telegram. From $30 CAD.">
+<meta property="og:image" content="https://polvisit.com/assets/social.png">
+<meta property="og:url" content="https://polvisit.com/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="description" content="Book a video visit with Farsi-speaking doctors, from anywhere in Canada, through Telegram. From $30 CAD.">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Vazirmatn:wght@300..900&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================
+   HOMA — design tokens
+   Palette: Isfahan tilework. Lapis ground, firuzeh turquoise,
+   saffron accent, parchment surfaces.
+   ========================================================== */
+:root{
+  --pine:#22523C;
+  --pine-deep:#16382A;
+  --sage:#7FBE9C;          /* on dark green */
+  --sage-deep:#3E7355;     /* on beige */
+  --sage-soft:rgba(62,115,85,.12);
+  --gold:#D6A63C;
+  --gold-bright:#E4B854;
+  --gold-soft:rgba(214,166,60,.16);
+  --paper:#F4ECDB;
+  --paper-deep:#EADFC5;
+  --paper-line:rgba(22,56,42,.14);
+  --ink:#1E2B22;
+  --ink-70:rgba(30,43,34,.74);
+  --ink-45:rgba(30,43,34,.5);
+  --cream:#F6F0E2;
+  --cream-70:rgba(246,240,226,.74);
+  --cream-45:rgba(246,240,226,.52);
+
+  --r-sm:10px;
+  --r-md:16px;
+  --r-lg:26px;
+  --maxw:1140px;
+  --shadow-lift:0 24px 50px -28px rgba(16,45,32,.5);
+  --shadow-card:0 12px 30px -20px rgba(16,45,32,.38);
+
+  --display:"Instrument Serif", "Vazirmatn", Georgia, serif;
+  --body:"Vazirmatn", system-ui, -apple-system, sans-serif;
+}
+
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--body);
+  font-weight:400;
+  font-size:16.5px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+img,svg{display:block;max-width:100%;}
+a{color:inherit;}
+ul{margin:0;padding:0;list-style:none;}
+p{margin:0;}
+h1,h2,h3,h4{margin:0;font-weight:400;}
+
+.wrap{max-width:var(--maxw);margin:0 auto;padding-inline:26px;}
+
+/* ---- Display type: serif in English, heavy Vazirmatn in Farsi ---- */
+.display{
+  font-family:var(--display);
+  font-weight:400;
+  letter-spacing:-.015em;
+  line-height:1.08;
+}
+[dir="rtl"] .display{
+  font-family:var(--body);
+  font-weight:800;
+  letter-spacing:0;
+  line-height:1.45;
+}
+
+/* ---- Eyebrow / small label ---- */
+.eyebrow{
+  display:inline-flex;align-items:center;gap:9px;
+  font-size:15px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--sage-deep);
+  margin-bottom:18px;
+}
+.eyebrow .star{width:15px;height:15px;fill:var(--gold);flex:none;}
+[dir="rtl"] .eyebrow{letter-spacing:0;text-transform:none;font-size:19.5px;font-weight:800;}
+.on-lapis .eyebrow{color:var(--sage);}
+
+/* ---- Buttons ---- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  padding:15px 27px;border-radius:999px;
+  font-family:var(--body);font-weight:700;font-size:15.5px;line-height:1;
+  text-decoration:none;cursor:pointer;border:1.5px solid transparent;
+  transition:transform .16s ease,box-shadow .16s ease,background .16s ease,border-color .16s ease;
+}
+.btn:focus-visible{outline:3px solid var(--gold);outline-offset:3px;}
+.btn-primary{background:var(--gold);color:#17301F;box-shadow:0 10px 26px -12px rgba(214,166,60,.7);}
+.btn-primary:hover{background:var(--gold-bright);transform:translateY(-2px);}
+.btn-solid{background:var(--pine);color:var(--cream);box-shadow:0 12px 26px -14px rgba(22,56,42,.8);}
+.btn-solid:hover{background:var(--pine-deep);transform:translateY(-2px);}
+.btn-ghost{background:transparent;color:var(--cream);border-color:rgba(246,240,226,.35);}
+.btn-ghost:hover{border-color:var(--cream);background:rgba(246,240,226,.07);}
+.btn-outline{background:transparent;color:var(--ink);border-color:var(--paper-line);}
+.btn-outline:hover{border-color:var(--pine);}
+.btn-sm{padding:10px 18px;font-size:13.5px;}
+.btn .tg{width:17px;height:17px;fill:currentColor;flex:none;}
+
+/* ---- Nav ---- */
+.nav{
+  position:sticky;top:0;z-index:60;
+  background:rgba(244,236,219,.95);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--paper-line);
+  transition:box-shadow .3s ease;
+}
+.nav.stuck{box-shadow:0 12px 30px -26px rgba(16,45,32,.75);}
+.nav-inner{
+  max-width:var(--maxw);margin:0 auto;padding:15px 26px;
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
+}
+.logo{
+  display:inline-flex;flex-direction:column;align-items:flex-start;gap:1px;
+  text-decoration:none;color:var(--ink);line-height:1;
+}
+.logo-svg{width:104px;height:auto;flex:none;display:block;}
+.logo-tag{
+  font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--sage-deep);font-weight:700;display:block;padding-inline-start:2px;
+}
+[dir="rtl"] .logo-tag{letter-spacing:0;text-transform:none;font-size:12.5px;font-weight:700;letter-spacing:0;}
+.nav-links{display:flex;gap:26px;font-size:14.5px;font-weight:600;color:var(--ink-70);}
+
+.nav-links a{text-decoration:none;padding-bottom:2px;border-bottom:1.5px solid transparent;}
+.nav-links a:hover{border-bottom-color:var(--gold);}
+.nav-right{display:flex;align-items:center;gap:12px;}
+.lang{
+  display:flex;border-radius:999px;overflow:hidden;
+  border:1.5px solid var(--paper-line);
+}
+.lang button{
+  font-family:var(--body);font-size:12.5px;font-weight:700;
+  padding:7px 12px;border:0;background:transparent;cursor:pointer;
+  color:var(--ink-45);transition:background .15s,color .15s;
+}
+.lang button.on{background:var(--gold);color:#17301F;}
+
+
+/* ==========================================================
+   HERO — lapis field with tile pattern + flight arc
+   ========================================================== */
+.hero{
+  position:relative;
+  background:
+    radial-gradient(120% 90% at 78% 8%, rgba(127,190,156,.26) 0%, rgba(22,82,60,0) 55%),
+    radial-gradient(90% 70% at 8% 95%, rgba(214,166,60,.2) 0%, rgba(22,82,60,0) 60%),
+    linear-gradient(168deg, #2A6047 0%, var(--pine) 42%, var(--pine-deep) 100%);
+  color:var(--cream);
+  overflow:hidden;
+}
+.hero-tile{position:absolute;inset:0;opacity:.5;pointer-events:none;}
+.hero-grid{
+  position:relative;z-index:2;
+  display:grid;grid-template-columns:1.08fr .92fr;gap:56px;align-items:center;
+  padding:88px 26px 40px;
+}
+.hero h1{font-size:clamp(42px,5.6vw,70px);margin-bottom:22px;}
+[dir="rtl"] .hero h1{font-size:clamp(32px,4.4vw,52px);}
+.hero h1 em{font-style:italic;color:var(--gold);}
+[dir="rtl"] .hero h1 em{font-style:normal;}
+.hero .sub{
+  font-size:clamp(17px,1.6vw,19.5px);color:var(--cream-70);
+  max-width:33em;margin-bottom:30px;
+}
+.hero-ctas{display:flex;flex-wrap:wrap;gap:13px;align-items:center;}
+.hero-reassure{
+  margin-top:16px;font-size:14px;color:var(--cream-45);
+  display:flex;align-items:center;gap:8px;
+}
+.hero-reassure svg{width:15px;height:15px;stroke:var(--sage);fill:none;stroke-width:2;flex:none;}
+
+.price-pill{
+  display:inline-flex;align-items:baseline;gap:9px;
+  background:rgba(246,240,226,.08);border:1px solid rgba(246,240,226,.18);
+  padding:9px 17px;border-radius:999px;margin-bottom:22px;
+  font-size:14px;color:var(--cream-70);
+}
+.price-pill b{font-family:var(--display);font-size:22px;color:var(--gold);font-weight:400;}
+[dir="rtl"] .price-pill b{font-family:var(--body);font-weight:800;font-size:18px;}
+
+/* ---- Telegram booking mock ---- */
+.mock{
+  position:relative;
+  background:rgba(246,240,226,.055);
+  border:1px solid rgba(246,240,226,.14);
+  border-radius:var(--r-lg);
+  padding:20px 20px 24px;
+  box-shadow:var(--shadow-lift);
+  backdrop-filter:blur(3px);
+}
+.mock-head{
+  display:flex;align-items:center;gap:11px;
+  padding-bottom:14px;margin-bottom:16px;
+  border-bottom:1px solid rgba(246,240,226,.13);
+}
+.mock-ava{
+  width:66px;height:38px;border-radius:10px;flex:none;
+  background:var(--cream);display:grid;place-items:center;
+}
+.mock-ava img{width:50px;height:auto;}
+
+.mock-title{font-weight:700;font-size:14.5px;}
+.mock-status{font-size:12px;color:var(--sage);}
+.bubbles{display:flex;flex-direction:column;gap:10px;}
+.bub{
+  max-width:88%;padding:11px 15px;border-radius:16px;font-size:14.5px;line-height:1.5;
+}
+.bub.bot{
+  background:rgba(246,240,226,.1);color:var(--cream);
+  border-start-start-radius:5px;align-self:flex-start;
+}
+.bub.me{
+  background:var(--sage);color:#17301F;font-weight:600;
+  border-end-end-radius:5px;align-self:flex-end;
+}
+.bub.confirm{
+  background:rgba(214,166,60,.14);border:1px solid rgba(214,166,60,.4);
+  color:var(--cream);align-self:flex-start;border-start-start-radius:5px;
+  display:flex;gap:10px;align-items:flex-start;
+}
+.bub.confirm svg{width:17px;height:17px;stroke:var(--gold);fill:none;stroke-width:2.4;flex:none;margin-top:3px;}
+.mock-foot{
+  margin-top:16px;font-size:12px;color:var(--cream-45);text-align:center;
+}
+
+/* ---- Trust strip under hero ---- */
+.strip{
+  position:relative;z-index:2;
+  border-top:1px solid rgba(246,240,226,.14);
+  background:rgba(16,45,32,.35);
+}
+.strip-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  max-width:var(--maxw);margin:0 auto;padding:0 26px;
+}
+.strip-item{
+  padding:20px 22px;display:flex;gap:11px;align-items:flex-start;
+  border-inline-end:1px solid rgba(246,240,226,.1);
+}
+.strip-item:last-child{border-inline-end:0;}
+.strip-item svg{width:19px;height:19px;stroke:var(--sage);fill:none;stroke-width:1.9;flex:none;margin-top:2px;}
+.strip-item b{display:block;font-size:14px;color:var(--cream);}
+.strip-item span{font-size:13px;color:var(--cream-45);line-height:1.45;}
+
+/* ==========================================================
+   Sections
+   ========================================================== */
+section{padding:96px 0;}
+.section-head{max-width:660px;margin-bottom:52px;}
+.section-head h2{font-size:clamp(31px,3.6vw,44px);margin-bottom:14px;}
+[dir="rtl"] .section-head h2{font-size:clamp(22px,2.3vw,29px);line-height:1.55;}
+.section-head p{color:var(--ink-70);font-size:17px;}
+.section-head .lede-p{font-size:clamp(19px,2vw,23px);line-height:1.55;}
+[dir="rtl"] .section-head .lede-p{font-size:clamp(17px,1.7vw,20px);line-height:1.9;}
+
+/* ---- How it works ---- */
+#how{background:var(--paper);}
+.steps{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:30px;
+  position:relative;
+}
+.steps-arc{
+  position:absolute;top:34px;inset-inline:8%;height:60px;width:84%;
+  pointer-events:none;opacity:.75;
+}
+.step{position:relative;z-index:2;}
+.step-mark{
+  width:70px;height:70px;position:relative;margin-bottom:22px;
+  display:grid;place-items:center;
+}
+.step-mark .shamseh{position:absolute;inset:0;width:70px;height:70px;fill:var(--paper-deep);}
+.step:nth-child(2) .shamseh{fill:#E3D7BB;}
+.step-num{
+  position:relative;font-family:var(--display);font-size:28px;color:var(--pine);line-height:1;
+}
+[dir="rtl"] .step-num{font-family:var(--body);font-weight:800;font-size:24px;}
+.step h3{font-size:21px;font-weight:700;margin-bottom:9px;}
+.step p{color:var(--ink-70);font-size:15.5px;}
+.step .meta{
+  margin-top:12px;display:inline-flex;align-items:center;gap:7px;
+  font-size:13px;font-weight:700;color:var(--sage-deep);
+  background:var(--sage-soft);padding:5px 12px;border-radius:999px;
+}
+.how-note{
+  margin-top:44px;padding:20px 24px;border-radius:var(--r-md);
+  background:var(--paper-deep);border:1px solid var(--paper-line);
+  display:flex;gap:14px;align-items:flex-start;font-size:15px;color:var(--ink-70);
+}
+.how-note svg{width:20px;height:20px;stroke:var(--pine);fill:none;stroke-width:1.9;flex:none;margin-top:3px;}
+
+/* ---- Specialties ---- */
+#specialties{background:var(--paper-deep);border-block:1px solid var(--paper-line);}
+.spec-list{display:flex;flex-wrap:wrap;gap:11px;}
+.spec{
+  display:inline-flex;align-items:center;gap:9px;
+  background:var(--paper);border:1px solid var(--paper-line);
+  padding:11px 18px;border-radius:999px;font-size:15px;font-weight:600;
+  transition:border-color .15s,transform .15s;
+}
+.spec:hover{border-color:var(--sage);transform:translateY(-2px);}
+.spec .star{width:11px;height:11px;fill:var(--sage);flex:none;}
+.spec-foot{margin-top:26px;font-size:14.5px;color:var(--ink-45);}
+
+/* ---- Doctors ---- */
+#doctors{background:var(--paper);}
+.doctor-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.doc-card{
+  display:flex;flex-direction:column;text-decoration:none;color:inherit;
+  font:inherit;text-align:start;padding:0;cursor:pointer;
+  background:var(--cream);border:1px solid var(--paper-line);
+  border-radius:var(--r-lg);overflow:hidden;
+  transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;
+}
+.doc-card:hover{transform:translateY(-4px);border-color:var(--sage-deep);box-shadow:var(--shadow-card);}
+.doc-photo{
+  aspect-ratio:4/3;display:grid;place-items:center;position:relative;
+  background:
+    repeating-linear-gradient(-45deg,
+      var(--paper-deep) 0 14px, var(--paper) 14px 28px);
+  border-bottom:1px solid var(--paper-line);
+}
+.doc-photo img{width:100%;height:100%;object-fit:cover;}
+.doc-initials{
+  width:96px;height:96px;border-radius:50%;background:var(--pine-deep);
+  color:var(--cream);display:grid;place-items:center;
+  font-family:var(--display);font-size:30px;letter-spacing:.02em;
+}
+[dir="rtl"] .doc-initials{font-family:var(--body);font-weight:800;font-size:25px;}
+.doc-info{padding:22px 24px 24px;display:flex;flex-direction:column;gap:7px;flex:1;}
+.doc-info h3{font-size:20px;font-weight:700;}
+.doc-info .spec-line{font-size:14.5px;font-weight:700;color:var(--sage-deep);}
+.doc-bio{font-size:15px;color:var(--ink-70);margin-top:4px;}
+.doc-info .doc-meta{font-size:13.5px;color:var(--ink-45);margin-top:2px;}
+.doc-cta{
+  margin-top:auto;padding-top:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+}
+.ph-chip{
+  font-size:12px;color:var(--ink-45);border:1px dashed var(--paper-line);
+  padding:4px 10px;border-radius:999px;
+}
+.doc-link{
+  font-size:14.5px;font-weight:700;color:var(--sage-deep);
+  display:inline-flex;align-items:center;gap:7px;
+}
+.doc-link .arw{transition:transform .18s ease;}
+.doc-card:hover .doc-link .arw{transform:translateX(4px);}
+[dir="rtl"] .doc-card:hover .doc-link .arw{transform:translateX(-4px);}
+[dir="rtl"] .doc-link .arw{transform:scaleX(-1);}
+[dir="rtl"] .doc-card:hover .doc-link .arw{transform:scaleX(-1) translateX(4px);}
+.docs-foot{margin-top:28px;font-size:14.5px;color:var(--ink-45);max-width:70ch;}
+
+/* ---- Floating book button ---- */
+.fab{
+  position:fixed;z-index:150;
+  inset-block-end:22px;inset-inline-end:22px;
+  display:inline-flex;align-items:center;gap:10px;
+  padding:15px 24px;border-radius:999px;
+  background:var(--gold);color:#17301F;
+  font-weight:700;font-size:15.5px;line-height:1;text-decoration:none;
+  box-shadow:0 14px 34px -12px rgba(16,45,32,.65);
+  opacity:0;transform:translateY(14px) scale(.96);pointer-events:none;
+  transition:opacity .3s ease,transform .3s ease,background .18s ease;
+}
+.fab.show{opacity:1;transform:none;pointer-events:auto;}
+.fab:hover{background:var(--gold-bright);}
+.fab:focus-visible{outline:3px solid var(--pine);outline-offset:3px;}
+.fab .tg{width:17px;height:17px;fill:currentColor;flex:none;}
+@media (max-width:560px){
+  .fab{inset-inline:16px;inset-block-end:16px;justify-content:center;padding:16px;}
+}
+
+/* ---- Doctor modal ---- */
+.doc-modal{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:24px;}
+.doc-modal[hidden]{display:none;}
+.dm-backdrop{position:absolute;inset:0;background:rgba(12,32,22,.6);backdrop-filter:blur(3px);
+  animation:fadeIn .2s ease both;}
+.dm-panel{
+  position:relative;z-index:2;width:min(620px,100%);max-height:86vh;overflow-y:auto;
+  background:var(--paper);border:1px solid var(--paper-line);border-radius:var(--r-lg);
+  padding:32px 34px;box-shadow:var(--shadow-lift);
+  animation:rise .32s cubic-bezier(.22,.68,.28,1) both;
+}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.dm-close{
+  position:absolute;top:14px;inset-inline-end:16px;
+  width:36px;height:36px;border-radius:50%;border:1px solid var(--paper-line);
+  background:var(--cream);color:var(--ink-70);font-size:22px;line-height:1;cursor:pointer;
+}
+.dm-close:hover{background:var(--paper-deep);}
+.dm-head{display:flex;gap:20px;align-items:center;margin-bottom:20px;flex-wrap:wrap;}
+.dm-portrait{
+  width:104px;height:104px;border-radius:var(--r-md);flex:none;display:grid;place-items:center;
+  background:repeating-linear-gradient(-45deg,var(--paper-deep) 0 12px,var(--paper) 12px 24px);
+  border:1px solid var(--paper-line);overflow:hidden;
+}
+.dm-portrait img{width:100%;height:100%;object-fit:cover;}
+.dm-portrait .doc-initials{width:72px;height:72px;font-size:24px;}
+.dm-head h3{font-size:23px;font-weight:700;}
+.dm-meta{font-size:14px;color:var(--ink-45);margin:4px 0 8px;}
+.dm-bio{font-size:16px;color:var(--ink-70);padding-bottom:20px;border-bottom:1px solid var(--paper-line);}
+.dm-block{padding:16px 0;border-bottom:1px solid var(--paper-line);}
+.dm-block h4{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--sage-deep);margin-bottom:9px;}
+[dir="rtl"] .dm-block h4{letter-spacing:0;text-transform:none;font-size:15px;}
+.dm-blank{
+  border:1px dashed var(--paper-line);border-radius:var(--r-sm);
+  padding:13px 15px;font-size:14px;color:var(--ink-45);background:var(--paper-deep);
+}
+.dm-foot{padding-top:20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.dm-note{font-size:13px;color:var(--ink-45);}
+@media (max-width:560px){
+  .doc-modal{padding:0;align-items:end;}
+  .dm-panel{max-height:92vh;border-radius:22px 22px 0 0;padding:28px 22px;}
+}
+
+/* ---- Trust ---- */
+#trust{background:var(--pine);color:var(--cream);}
+#trust .section-head p{color:var(--cream-70);}
+.trust-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;}
+.trust-card{
+  background:rgba(246,240,226,.055);border:1px solid rgba(246,240,226,.13);
+  border-radius:var(--r-lg);padding:28px 26px;
+}
+.trust-card .ic{
+  width:44px;height:44px;border-radius:13px;margin-bottom:16px;
+  display:grid;place-items:center;background:rgba(127,190,156,.16);
+}
+.trust-card .ic svg{width:21px;height:21px;stroke:var(--sage);fill:none;stroke-width:1.9;}
+.trust-card h3{font-size:19px;font-weight:700;margin-bottom:8px;}
+.trust-card p{color:var(--cream-70);font-size:15.5px;}
+.trust-card .fine{
+  margin-top:13px;font-size:13.5px;color:var(--gold);font-weight:600;
+}
+.emergency{
+  margin-top:24px;display:flex;gap:13px;align-items:flex-start;
+  border:1px solid rgba(214,166,60,.35);background:rgba(214,166,60,.08);
+  padding:18px 22px;border-radius:var(--r-md);font-size:14.5px;color:var(--cream-70);
+}
+.emergency svg{width:19px;height:19px;stroke:var(--gold);fill:none;stroke-width:2;flex:none;margin-top:3px;}
+
+/* ---- Founder note ---- */
+#why{background:var(--paper);}
+.why-grid{display:grid;grid-template-columns:auto 1fr;gap:40px;align-items:start;}
+.why-mark{width:150px;height:auto;opacity:.92;}
+.why-lede{
+  font-family:var(--display);font-size:clamp(24px,2.7vw,33px);line-height:1.32;
+  margin-bottom:20px;
+}
+[dir="rtl"] .why-lede{font-family:var(--body);font-weight:700;font-size:clamp(20px,2.2vw,26px);line-height:1.7;}
+.why-body{color:var(--ink-70);font-size:16.5px;max-width:56ch;}
+.why-body + .why-body{margin-top:14px;}
+.why-sign{
+  margin-top:22px;padding-top:18px;border-top:1px solid var(--paper-line);
+  font-size:14px;color:var(--ink-45);max-width:56ch;
+}
+
+/* ---- FAQ ---- */
+#faq{background:var(--paper-deep);border-block:1px solid var(--paper-line);}
+.faq{max-width:820px;}
+.faq details{
+  border-bottom:1px solid var(--paper-line);
+}
+.faq summary{
+  list-style:none;cursor:pointer;padding:20px 0;
+  display:flex;justify-content:space-between;align-items:center;gap:20px;
+  font-size:17.5px;font-weight:700;
+}
+.faq summary::-webkit-details-marker{display:none;}
+.faq summary:focus-visible{outline:3px solid var(--gold);outline-offset:4px;border-radius:4px;}
+.faq .pm{
+  width:24px;height:24px;flex:none;position:relative;
+  border-radius:50%;border:1.5px solid var(--paper-line);
+  transition:transform .22s ease,border-color .22s ease;
+}
+.faq .pm::before,.faq .pm::after{
+  content:"";position:absolute;inset-inline-start:50%;top:50%;
+  background:var(--pine);transform:translate(-50%,-50%);
+}
+.faq .pm::before{width:10px;height:1.6px;}
+.faq .pm::after{width:1.6px;height:10px;transition:opacity .2s ease;}
+.faq details[open] .pm{transform:rotate(90deg);border-color:var(--sage);}
+.faq details[open] .pm::after{opacity:0;}
+.faq .ans{padding:0 0 22px;color:var(--ink-70);font-size:16px;max-width:66ch;}
+
+/* ---- Final CTA ---- */
+#book{padding:0 0 96px;background:var(--paper-deep);}
+.cta-panel{
+  position:relative;overflow:hidden;
+  background:linear-gradient(150deg,var(--pine) 0%,var(--pine-deep) 100%);
+  color:var(--cream);border-radius:34px;padding:66px 56px;text-align:center;
+  box-shadow:var(--shadow-lift);
+}
+.cta-tile{position:absolute;inset:0;opacity:.4;pointer-events:none;}
+.cta-panel > *{position:relative;z-index:2;}
+.cta-panel h2{font-size:clamp(32px,4vw,50px);margin-bottom:16px;}
+[dir="rtl"] .cta-panel h2{font-size:clamp(26px,3.2vw,38px);}
+.cta-panel p{color:var(--cream-70);font-size:18px;max-width:44ch;margin:0 auto 30px;}
+.cta-points{
+  margin-top:30px;display:flex;flex-wrap:wrap;justify-content:center;gap:10px 26px;
+  font-size:14px;color:var(--cream-45);
+}
+.cta-points span{display:inline-flex;align-items:center;gap:7px;}
+.cta-points svg{width:14px;height:14px;stroke:var(--sage);fill:none;stroke-width:2.4;}
+
+/* ---- Footer ---- */
+footer{background:var(--paper);padding:56px 0 40px;border-top:1px solid var(--paper-line);}
+.foot-top{
+  display:flex;justify-content:space-between;align-items:center;gap:30px;flex-wrap:wrap;
+  padding-bottom:26px;border-bottom:1px solid var(--paper-line);
+}
+footer .logo{flex:none;}
+footer .logo-svg{width:112px;height:auto;}
+.foot-links{display:flex;flex-wrap:wrap;gap:22px;font-size:14.5px;font-weight:600;color:var(--ink-70);}
+.foot-links a{text-decoration:none;}
+.foot-links a:hover{color:var(--sage-deep);}
+.disclaimer{margin-top:24px;font-size:13.5px;color:var(--ink-45);max-width:78ch;line-height:1.6;}
+.foot-bottom{
+  margin-top:26px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  font-size:13.5px;color:var(--ink-45);
+}
+.foot-bottom a{color:var(--sage-deep);font-weight:700;text-decoration:none;}
+
+/* ---- Reveal on scroll ---- */
+.rv{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease;}
+.rv.in{opacity:1;transform:none;}
+
+
+/* ==========================================================
+   MOTION
+   ========================================================== */
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes bubIn{from{opacity:0;transform:translateY(12px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes draw{from{stroke-dashoffset:44}to{stroke-dashoffset:0}}
+@keyframes march{from{stroke-dashoffset:0}to{stroke-dashoffset:-280}}
+@keyframes pulseDot{0%,100%{opacity:.35;transform:scale(1)}50%{opacity:1;transform:scale(1.35)}}
+
+/* hero copy: staggered entrance */
+.hero-copy > *{animation:rise .8s cubic-bezier(.22,.68,.28,1) both;}
+.hero-copy > *:nth-child(1){animation-delay:.06s}
+.hero-copy > *:nth-child(2){animation-delay:.14s}
+.hero-copy > *:nth-child(3){animation-delay:.22s}
+.hero-copy > *:nth-child(4){animation-delay:.3s}
+.hero-copy > *:nth-child(5){animation-delay:.38s}
+.hero-copy > *:nth-child(6){animation-delay:.46s}
+
+/* wingmark draws itself */
+.logo-svg,.mock-ava img{animation:rise .8s cubic-bezier(.22,.68,.28,1) .1s both;}
+.why-mark{opacity:0;transform:translateY(14px);transition:opacity .7s ease,transform .7s ease;}
+.rv.in .why-mark{opacity:.9;transform:none;}
+
+/* telegram thread types itself out */
+.mock{animation:rise .9s cubic-bezier(.22,.68,.28,1) .34s both;}
+.bub{animation:bubIn .55s cubic-bezier(.2,.8,.3,1) both;}
+.bub.me{transform-origin:100% 100%;}
+.bub:nth-child(1){animation-delay:.85s}
+.bub:nth-child(2){animation-delay:1.3s}
+.bub:nth-child(3){animation-delay:1.75s}
+.bub:nth-child(4){animation-delay:2.2s}
+.bub:nth-child(5){animation-delay:2.65s}
+.mock-status::after{
+  content:"";display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:var(--sage);margin-inline-start:7px;vertical-align:middle;
+  animation:pulseDot 2.4s ease-in-out infinite;
+}
+
+/* dashed arc travels between the steps */
+.steps-arc path{animation:march 26s linear infinite;}
+
+/* staggered children inside revealed blocks */
+.stagger > *{opacity:0;transform:translateY(14px);transition:opacity .6s cubic-bezier(.22,.68,.28,1),transform .6s cubic-bezier(.22,.68,.28,1);}
+.stagger.in > *{opacity:1;transform:none;}
+.stagger > .steps-arc{opacity:1;transform:none;transition:none;}
+
+/* micro-interactions */
+.btn .tg{transition:transform .18s ease;}
+.btn:hover .tg{transform:translateX(3px);}
+[dir="rtl"] .btn:hover .tg{transform:translateX(-3px);}
+.trust-card{transition:border-color .25s ease,transform .25s ease;}
+.trust-card:hover{border-color:rgba(127,190,156,.45);transform:translateY(-3px);}
+.strip-item b,.step h3{transition:color .2s ease;}
+
+/* FAQ: height-animated disclosure */
+.faq .ans-wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .34s cubic-bezier(.3,.7,.3,1);}
+.faq .ans-wrap.open{grid-template-rows:1fr;}
+.faq .ans-wrap > .ans{overflow:hidden;min-height:0;}
+
+
+/* ---- Hero ambient drift ---- */
+.hero-aura{
+  position:absolute;border-radius:50%;pointer-events:none;
+  filter:blur(90px);will-change:transform,opacity;
+}
+.hero-aura.a1{
+  width:52vw;height:52vw;max-width:760px;max-height:760px;
+  top:-16%;inset-inline-end:-10%;
+  background:radial-gradient(circle,rgba(127,190,156,.4) 0%,rgba(127,190,156,0) 70%);
+  animation:drift1 34s ease-in-out infinite;
+}
+.hero-aura.a2{
+  width:44vw;height:44vw;max-width:620px;max-height:620px;
+  bottom:-22%;inset-inline-start:-12%;
+  background:radial-gradient(circle,rgba(214,166,60,.3) 0%,rgba(214,166,60,0) 70%);
+  animation:drift2 46s ease-in-out infinite;
+}
+@keyframes drift1{
+  0%,100%{transform:translate3d(0,0,0) scale(1);opacity:.75;}
+  50%{transform:translate3d(-4%,5%,0) scale(1.12);opacity:1;}
+}
+@keyframes drift2{
+  0%,100%{transform:translate3d(0,0,0) scale(1.06);opacity:.6;}
+  50%{transform:translate3d(6%,-4%,0) scale(.94);opacity:.9;}
+}
+@keyframes tileBreathe{0%,100%{opacity:.42}50%{opacity:.58}}
+.hero-tile{animation:tileBreathe 24s ease-in-out infinite;}
+
+/* ---- Responsive ---- */
+@media (max-width:960px){
+  .hero-grid{grid-template-columns:1fr;gap:40px;padding-top:64px;}
+  .strip-grid{grid-template-columns:repeat(2,1fr);}
+  .strip-item:nth-child(2){border-inline-end:0;}
+  .strip-item:nth-child(1),.strip-item:nth-child(2){border-bottom:1px solid rgba(246,240,226,.1);}
+  .steps{grid-template-columns:1fr;gap:34px;}
+  .steps-arc{display:none;}
+  .trust-grid{grid-template-columns:1fr;}
+  .doctor-grid{grid-template-columns:1fr;}
+  .why-grid{grid-template-columns:1fr;gap:24px;}
+  .nav-links{display:none;}
+  section{padding:72px 0;}
+  .cta-panel{padding:48px 26px;border-radius:26px;}
+}
+@media (max-width:560px){
+  .strip-grid{grid-template-columns:1fr;}
+  .strip-item{border-inline-end:0;border-bottom:1px solid rgba(246,240,226,.1);}
+  .hero-ctas .btn{width:100%;}
+  .logo-tag{display:none;}
+  .logo-svg{width:88px;height:auto;}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none !important;transition:none !important;}
+  .rv,.hero-copy > *,.bub,.mock,.stagger > *{opacity:1 !important;transform:none !important;}
+  .logo-svg,.mock-ava img,.why-mark{opacity:1 !important;transform:none !important;}
+  .faq .ans-wrap{grid-template-rows:1fr !important;}
+  .hero-aura{display:none;}
+  .dm-panel,.dm-backdrop{opacity:1 !important;transform:none !important;}
+  .fab.show{opacity:1 !important;transform:none !important;}
+  html{scroll-behavior:auto;}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== shared SVG symbols ===== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="telegram" viewBox="0 0 24 24">
+    <path d="M21.9 4.3 18.8 19.1c-.2 1-.9 1.3-1.7.8l-4.7-3.5-2.3 2.2c-.3.3-.5.5-1 .5l.3-4.8 8.8-8c.4-.3-.1-.5-.6-.2L6.8 13.2 2.2 11.7c-1-.3-1-1 .2-1.5L20.6 3.1c.8-.3 1.5.2 1.3 1.2z"/>
+  </symbol>
+  <!-- tile pattern used on lapis surfaces -->
+  <pattern id="tile" width="88" height="88" patternUnits="userSpaceOnUse">
+    <g fill="none" stroke="#F6F0E2" stroke-opacity=".085" stroke-width="1">
+      <path d="M44 6 L82 44 L44 82 L6 44 Z"/>
+      <path d="M44 22 L66 44 L44 66 L22 44 Z"/>
+      <path d="M0 0 L88 88 M88 0 L0 88"/>
+    </g>
+    <circle cx="44" cy="44" r="2.4" fill="#D6A63C" fill-opacity=".16"/>
+    <animateTransform id="tiledrift" attributeName="patternTransform" type="translate"
+                      from="0 0" to="88 88" dur="110s" repeatCount="indefinite"/>
+  </pattern>
+</svg>
+
+<!-- ===== NAV ===== -->
+<header class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="#top" class="logo" aria-label="Pol">
+      <img class="logo-svg" src="assets/logo.png" alt="Pol">
+      <span class="logo-tag i18n" data-en="Farsi telehealth" data-fa="ویزیت آنلاین فارسی">Farsi telehealth</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#how" class="i18n" data-en="How it works" data-fa="روش کار">How it works</a>
+      <a href="#specialties" class="i18n" data-en="Specialties" data-fa="تخصص‌ها">Specialties</a>
+      <a href="#doctors" class="i18n" data-en="Doctors" data-fa="پزشکان">Doctors</a>
+      <a href="#trust" class="i18n" data-en="Safety" data-fa="ایمنی">Safety</a>
+      <a href="#faq" class="i18n" data-en="FAQ" data-fa="سوالات متداول">FAQ</a>
+    </nav>
+    <div class="nav-right">
+      <div class="lang" role="group" aria-label="Language">
+        <button data-lang="en" class="on">EN</button>
+        <button data-lang="fa">فارسی</button>
+      </div>
+      <a class="btn btn-primary btn-sm tg" data-src="nav" href="#" target="_blank" rel="noopener">
+        <svg class="tg" viewBox="0 0 24 24"><use href="#telegram"/></svg>
+        <span class="i18n" data-en="Book a visit" data-fa="رزرو نوبت">Book a visit</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ===== HERO ===== -->
+<section class="hero on-lapis" style="padding-bottom:0;">
+  <div class="hero-aura a1" aria-hidden="true"></div>
+  <div class="hero-aura a2" aria-hidden="true"></div>
+  <svg class="hero-tile" aria-hidden="true"><rect width="100%" height="100%" fill="url(#tile)"/></svg>
+
+  <div class="hero-grid wrap">
+    <div class="hero-copy">
+
+
+      <h1 class="display i18n"
+          data-en='Explain your symptoms <em>in Farsi.</em> Get answers the same week.'
+          data-fa='مشکلتان را <em>به فارسی</em> بگویید. همین هفته پاسخ بگیرید.'>
+        Explain your symptoms <em>in Farsi.</em> Get answers the same week.
+      </h1>
+
+      <p class="sub i18n"
+         data-en="Pol connects you with Farsi-speaking specialist doctors by video — booked, paid for, and confirmed inside Telegram. No referral, no months-long waitlist, no translating your own body."
+         data-fa="پل شما را از طریق ویزیت تصویری به پزشکان متخصص فارسی‌زبان وصل می‌کند؛ رزرو، پرداخت و تأیید، همه داخل تلگرام. بدون ارجاع، بدون ماه‌ها انتظار و بدون اینکه مجبور باشید حال خودتان را ترجمه کنید.">
+        Pol connects you with Farsi-speaking specialist doctors by video — booked, paid for, and confirmed inside Telegram. No referral, no months-long waitlist, no translating your own body.
+      </p>
+
+      <div class="price-pill">
+        <b id="price-hero">From $30 CAD</b>
+        <span class="i18n" data-en="per video visit — the fee is shown before you confirm" data-fa="برای هر ویزیت تصویری — مبلغ پیش از تأیید نمایش داده می‌شود">per video visit — the fee is shown before you confirm</span>
+      </div>
+
+      <div class="hero-ctas">
+        <a class="btn btn-primary tg" data-src="hero" href="#" target="_blank" rel="noopener">
+          <svg class="tg" viewBox="0 0 24 24"><use href="#telegram"/></svg>
+          <span class="i18n" data-en="See available times" data-fa="زمان‌های در دسترس را ببینید">See available times</span>
+        </a>
+      </div>
+
+      <p class="hero-reassure">
+        <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+        <span class="i18n" data-en="Nothing to install. Free to browse doctors and times — you only pay once you pick a slot." data-fa="بدون نصب اپلیکیشن. مشاهده پزشکان و زمان‌ها رایگان است؛ فقط پس از انتخاب نوبت پرداخت می‌کنید.">Nothing to install. Free to browse doctors and times — you only pay once you pick a slot.</span>
+      </p>
+    </div>
+
+    <!-- Telegram booking mock -->
+    <div class="mock" aria-hidden="true">
+      <div class="mock-head">
+        <div class="mock-ava"><img src="assets/logo.png" alt=""></div>
+        <div>
+          <div class="mock-title i18n" data-en="Pol — booking" data-fa="پل — رزرو نوبت">Pol — booking</div>
+          <div class="mock-status i18n" data-en="bot · online" data-fa="ربات · آنلاین">bot · online</div>
+        </div>
+      </div>
+      <div class="bubbles">
+        <div class="bub bot i18n" data-en="Which specialty do you need?" data-fa="به کدام تخصص نیاز دارید؟">Which specialty do you need?</div>
+        <div class="bub me i18n" data-en="Dermatology" data-fa="پوست و مو">Dermatology</div>
+        <div class="bub bot i18n" data-en="Two doctors are available this week. Earliest time: Tuesday 18:30 your local time." data-fa="این هفته دو پزشک در دسترس هستند. نزدیک‌ترین زمان: سه‌شنبه ساعت ۱۸:۳۰ به وقت محلی شما.">Two doctors are available this week. Earliest time: Tuesday 18:30 your local time.</div>
+        <div class="bub me i18n" data-en="Book that one" data-fa="همان را رزرو کن">Book that one</div>
+        <div class="bub confirm">
+          <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+          <span class="i18n" data-en="Held for 60 minutes. Pay to confirm — you'll get the video link and a reminder before your visit." data-fa="نوبت تا ۶۰ دقیقه نگه داشته می‌شود. برای تأیید پرداخت کنید؛ لینک ویزیت و یادآوری پیش از نوبت برایتان ارسال می‌شود.">Held for 60 minutes. Pay to confirm — you'll get the video link and a reminder before your visit.</span>
+        </div>
+      </div>
+      <div class="mock-foot i18n" data-en="Illustration of the booking flow" data-fa="نمونه‌ای از فرایند رزرو">Illustration of the booking flow</div>
+    </div>
+  </div>
+
+  <!-- trust strip -->
+  <div class="strip">
+    <div class="strip-grid stagger rv">
+      <div class="strip-item">
+        <svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/></svg>
+        <div>
+          <b class="i18n" data-en="Licences checked" data-fa="بررسی مدارک">Licences checked</b>
+          <span class="i18n" data-en="We verify every doctor's medical licence before they can take a booking." data-fa="پیش از آنکه پزشکی بتواند نوبت بپذیرد، مجوز پزشکی او را بررسی می‌کنیم.">We verify every doctor's medical licence before they can take a booking.</span>
+        </div>
+      </div>
+      <div class="strip-item">
+        <svg viewBox="0 0 24 24"><path d="M12 3v18M17 6H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        <div>
+          <b class="i18n" data-en="Refundable" data-fa="قابل بازگشت">Refundable</b>
+          <span class="i18n" data-en="Cancel more than 24 hours ahead and you get 100% back." data-fa="اگر بیش از ۲۴ ساعت پیش از نوبت لغو کنید، صد درصد مبلغ بازگردانده می‌شود.">Cancel more than 24 hours ahead and you get 100% back.</span>
+        </div>
+      </div>
+      <div class="strip-item">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        <div>
+          <b class="i18n" data-en="Evenings included" data-fa="نوبت عصرها">Evenings included</b>
+          <span class="i18n" data-en="Times are shown in your own timezone, including after work." data-fa="زمان‌ها به وقت محلی خودتان نمایش داده می‌شود، از جمله بعد از ساعت کاری.">Times are shown in your own timezone, including after work.</span>
+        </div>
+      </div>
+      <div class="strip-item">
+        <svg viewBox="0 0 24 24"><path d="M4 5h16v12H8l-4 4V5z"/></svg>
+        <div>
+          <b class="i18n" data-en="Inside Telegram" data-fa="داخل تلگرام">Inside Telegram</b>
+          <span class="i18n" data-en="No new account, no app download, no forms to print." data-fa="بدون ساخت حساب جدید، بدون نصب اپلیکیشن و بدون فرم کاغذی.">No new account, no app download, no forms to print.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section id="how">
+  <div class="wrap">
+    <div class="section-head rv">
+      <div class="eyebrow">
+        <svg class="star" viewBox="0 0 100 100"><use href="#shamseh"/></svg>
+        <span class="i18n" data-en="How it works" data-fa="روش کار">How it works</span>
+      </div>
+      <h2 class="display i18n" data-en="From first message to doctor, in about five minutes" data-fa="از اولین پیام تا پزشک، حدود پنج دقیقه">From first message to doctor, in about five minutes</h2>
+      <p class="i18n" data-en="Three steps, all in Telegram. You can stop at any point — nothing is charged until you choose a time." data-fa="سه مرحله، همه در تلگرام. هر لحظه می‌توانید متوقف شوید؛ تا زمانی که نوبتی انتخاب نکنید هیچ مبلغی دریافت نمی‌شود.">Three steps, all in Telegram. You can stop at any point — nothing is charged until you choose a time.</p>
+    </div>
+
+    <div class="steps rv stagger">
+      <svg class="steps-arc" viewBox="0 0 900 60" fill="none" aria-hidden="true" preserveAspectRatio="none">
+        <path d="M20 40 C 240 -10, 660 -10, 880 40" stroke="var(--gold)" stroke-width="1.6" stroke-dasharray="6 8" stroke-linecap="round" opacity=".65"/>
+      </svg>
+
+      <div class="step">
+        <div class="step-mark">
+          <svg class="shamseh" viewBox="0 0 100 100"><use href="#shamseh"/></svg>
+          <span class="step-num i18n" data-en="1" data-fa="۱">1</span>
+        </div>
+        <h3 class="i18n" data-en="Tell the bot what's wrong" data-fa="مشکل‌تان را به ربات بگویید">Tell the bot what's wrong</h3>
+        <p class="i18n" data-en="Pick a specialty from a list — no long forms, no medical vocabulary required. In Farsi or English, whichever is easier." data-fa="تخصص را از فهرست انتخاب کنید؛ بدون فرم طولانی و بدون نیاز به اصطلاحات پزشکی. به فارسی یا انگلیسی، هرکدام راحت‌ترید.">Pick a specialty from a list — no long forms, no medical vocabulary required. In Farsi or English, whichever is easier.</p>
+        <span class="meta i18n" data-en="~1 minute" data-fa="حدود ۱ دقیقه">~1 minute</span>
+      </div>
+
+      <div class="step">
+        <div class="step-mark">
+          <svg class="shamseh" viewBox="0 0 100 100"><use href="#shamseh"/></svg>
+          <span class="step-num i18n" data-en="2" data-fa="۲">2</span>
+        </div>
+        <h3 class="i18n" data-en="Choose a doctor and a time" data-fa="پزشک و زمان را انتخاب کنید">Choose a doctor and a time</h3>
+        <p class="i18n" data-en="Read each doctor's training and experience first. Real open slots appear in your own timezone. Your slot is held 60 minutes while you pay." data-fa="ابتدا سوابق و تحصیلات هر پزشک را بخوانید. زمان‌های واقعاً خالی، به وقت محلی خودتان نمایش داده می‌شود و نوبت شما تا ۶۰ دقیقه برای پرداخت نگه داشته می‌شود.">Read each doctor's training and experience first. Real open slots appear in your own timezone. Your slot is held 60 minutes while you pay.</p>
+        <span class="meta i18n" data-en="Fee shown before you pay" data-fa="مبلغ پیش از پرداخت نمایش داده می‌شود">Fee shown before you pay</span>
+      </div>
+
+      <div class="step">
+        <div class="step-mark">
+          <svg class="shamseh" viewBox="0 0 100 100"><use href="#shamseh"/></svg>
+          <span class="step-num i18n" data-en="3" data-fa="۳">3</span>
+        </div>
+        <h3 class="i18n" data-en="Meet your doctor by video" data-fa="ویزیت تصویری با پزشک">Meet your doctor by video</h3>
+        <p class="i18n" data-en="You get a reminder and a link. Speak Farsi the whole way through, ask everything twice if you want, and keep the written summary afterwards." data-fa="یادآوری و لینک ویزیت را دریافت می‌کنید. تمام گفتگو به فارسی است، هر سؤالی را می‌توانید دوباره بپرسید و خلاصه‌ی مکتوب ویزیت برایتان باقی می‌ماند.">You get a reminder and a link. Speak Farsi the whole way through, ask everything twice if you want, and keep the written summary afterwards.</p>
+        <span class="meta i18n" data-en="No waiting room" data-fa="بدون اتاق انتظار">No waiting room</span>
+      </div>
+    </div>
+
+    <div class="how-note rv">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
+      <p class="i18n"
+         data-en="A Pol visit is a consultation with a doctor abroad. It works well for second opinions, chronic follow-up, mental health, skin, nutrition and questions you'd struggle to explain in English — and it does not replace your Canadian family doctor or a prescription written in Canada."
+         data-fa="ویزیت پل یک مشاوره با پزشک خارج از کاناداست. برای نظر دوم، پیگیری بیماری‌های مزمن، سلامت روان، پوست، تغذیه و پرسش‌هایی که توضیح‌شان به انگلیسی برایتان دشوار است بسیار مفید است — و جایگزین پزشک خانواده‌ی شما در کانادا یا نسخه‌ی صادرشده در کانادا نیست.">
+        A Pol visit is a consultation with a doctor abroad. It works well for second opinions, chronic follow-up, mental health, skin, nutrition and questions you'd struggle to explain in English — and it does not replace your Canadian family doctor or a prescription written in Canada.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SPECIALTIES ===== -->
+<section id="specialties">
+  <div class="wrap">
+    <div class="section-head rv">
+      <div class="eyebrow">
+        <svg class="star" viewBox="0 0 100 100"><use href="#shamseh"/></svg>
+        <span class="i18n" data-en="Care areas" data-fa="حوزه‌های درمانی">Care areas</span>
+      </div>
+      <h2 class="display i18n" data-en="Eleven specialties, one conversation away" data-fa="یازده تخصص، تنها یک گفتگو با شما فاصله دارند">Eleven specialties, one conversation away</h2>
+    </div>
+    <div class="spec-list rv stagger" id="spec-list"></div>
+    <p class="spec-foot rv i18n" data-en="Not sure which one you need? Start the chat and describe it in your own words — we'll point you to the right specialty." data-fa="نمی‌دانید به کدام تخصص نیاز دارید؟ گفتگو را شروع کنید و با زبان خودتان توضیح دهید؛ ما تخصص مناسب را به شما معرفی می‌کنیم.">Not sure which one you need? Start the chat and describe it in your own words — we'll point you to the right specialty.</p>
+  </div>
+</section>
+
+<!-- ===== DOCTORS ===== -->
+<section id="doctors">
+  <div class="wrap">
+    <div class="section-head rv">
+      <div class="eyebrow">
+        <svg class="star" viewBox="0 0 100 100"><use href="#shamseh"/></svg>
+        <span class="i18n" data-en="The doctors" data-fa="پزشکان">The doctors</span>
+      </div>
+      <h2 class="display i18n" data-en="Read who you're booking, before you book" data-fa="پیش از رزرو، پزشک خود را بشناسید">Read who you're booking, before you book</h2>
+      <p class="i18n" data-en="Every doctor's training, years in practice and specialty are on their profile. Tap any card to read the full one." data-fa="تحصیلات، سال‌های فعالیت و تخصص هر پزشک در پروفایل او آمده است. برای خواندن پروفایل کامل، روی هر کارت بزنید.">Every doctor's training, years in practice and specialty are on their profile. Tap any card to read the full one.</p>
+    </div>
+    <div class="doctor-grid rv stagger" id="doctor-grid"></div>
+    <p class="docs-foot rv i18n" data-en="These are placeholder profiles while we finish verifying our first group of doctors. Real profiles, with photos and credentials, go live at launch." data-fa="این پروفایل‌ها موقت هستند و تا پایان بررسی مدارک نخستین گروه پزشکان نمایش داده می‌شوند. پروفایل‌های واقعی همراه با عکس و مدارک، هنگام راه‌اندازی منتشر می‌شوند.">These are placeholder profiles while we finish verifying our first group of doctors.</p>
+  </div>
+</section>
+
+<!-- ===== TRUST ===== -->
+<section id="trust" class="on-lapis">
+  <div class="wrap">
+    <div class="section-head rv">
+      <div class="eyebrow">
+        <svg class="star" viewBox="0 0 100 100"><use href="#shamseh"/></svg>
+        <span class="i18n" data-en="Straight answers" data-fa="پاسخ‌های شفاف">Straight answers</span>
+      </div>
+
+      <p class="lede-p i18n" data-en="Health decisions deserve plain language. Here is exactly how Pol handles your doctor, your money and your information." data-fa="تصمیم‌های مربوط به سلامت، زبان ساده می‌طلبد. اینجا دقیقاً می‌بینید که پل با پزشک، پول و اطلاعات شما چگونه رفتار می‌کند.">Health decisions deserve plain language. Here is exactly how Pol handles your doctor, your money and your information.</p>
+    </div>
+
+    <div class="trust-grid rv stagger">
+      <div class="trust-card">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9.5 12l1.8 1.8L15 10"/></svg></div>
+        <h3 class="i18n" data-en="Every doctor is verified before their first booking" data-fa="هر پزشک پیش از اولین نوبت تأیید می‌شود">Every doctor is verified before their first booking</h3>
+        <p class="i18n" data-en="We check each physician's medical licence and specialist credentials by hand. Their training and years of practice are on their profile so you can judge for yourself before booking." data-fa="مجوز پزشکی و مدارک تخصصی هر پزشک را به‌صورت دستی بررسی می‌کنیم. سوابق تحصیلی و سال‌های فعالیت او در پروفایلش آمده تا پیش از رزرو، خودتان قضاوت کنید.">We check each physician's medical licence and specialist credentials by hand. Their training and years of practice are on their profile so you can judge for yourself before booking.</p>
+      </div>
+
+      <div class="trust-card">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3v18M17 6H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+        <h3 class="i18n" data-en="You know the price, and you can get it back" data-fa="مبلغ را از قبل می‌دانید و قابل بازگشت است">You know the price, and you can get it back</h3>
+        <p class="i18n" data-en="The fee appears before you confirm — no consultation charges, no surprise add-ons. Cancel more than 24 hours before your visit for a full refund; cancel later and half is returned." data-fa="مبلغ پیش از تأیید نمایش داده می‌شود؛ بدون هزینه‌ی پنهان و بدون افزوده‌ی ناگهانی. اگر بیش از ۲۴ ساعت پیش از ویزیت لغو کنید، کل مبلغ و اگر دیرتر لغو کنید، نیمی از آن بازگردانده می‌شود.">The fee appears before you confirm — no consultation charges, no surprise add-ons. Cancel more than 24 hours before your visit for a full refund; cancel later and half is returned.</p>
+        <div class="fine i18n" data-en="Every payment is matched to your booking by a person on our team." data-fa="هر پرداخت توسط یکی از اعضای تیم ما با رزرو شما تطبیق داده می‌شود.">Every payment is matched to your booking by a person on our team.</div>
+      </div>
+
+      <div class="trust-card">
+        <div class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg></div>
+        <h3 class="i18n" data-en="Your visit stays between you and your doctor" data-fa="ویزیت شما بین شما و پزشک‌تان می‌ماند">Your visit stays between you and your doctor</h3>
+        <p class="i18n" data-en="Your notes and history are visible only to the doctor you booked and the small team that runs bookings. We don't sell data and we don't share your file with family members unless you ask us to." data-fa="یادداشت‌ها و سوابق شما فقط برای پزشکی که رزرو کرده‌اید و تیم کوچک هماهنگی نوبت‌ها قابل مشاهده است. ما اطلاعات را نمی‌فروشیم و بدون درخواست خودتان، پرونده‌تان را با اعضای خانواده در میان نمی‌گذاریم.">Your notes and history are visible only to the doctor you booked and the small team that runs bookings. We don't sell data and we don't share your file with family members unless you ask us to.</p>
+      </div>
+
+      <div class="trust-card">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M3 12h4l2 6 4-14 2 8h6"/></svg></div>
+        <h3 class="i18n" data-en="We tell you when we're the wrong option" data-fa="اگر گزینه‌ی مناسبی نباشیم، می‌گوییم">We tell you when we're the wrong option</h3>
+        <p class="i18n" data-en="A video consultation can't examine you, order lab work in Canada, or write a Canadian prescription. If your case needs hands-on care, the doctor will say so and you can ask for a refund." data-fa="ویزیت تصویری نمی‌تواند شما را معاینه کند، آزمایش در کانادا درخواست دهد یا نسخه‌ی کانادایی بنویسد. اگر وضعیت شما نیاز به مراقبت حضوری داشته باشد، پزشک همان‌جا می‌گوید و شما می‌توانید درخواست بازگشت وجه بدهید.">A video consultation can't examine you, order lab work in Canada, or write a Canadian prescription. If your case needs hands-on care, the doctor will say so and you can ask for a refund.</p>
+      </div>
+    </div>
+
+    <div class="emergency rv">
+      <svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01M10.3 3.9 2.4 17.5A2 2 0 0 0 4.1 20.5h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+      <p class="i18n" data-en="Pol is not for emergencies. If you have chest pain, trouble breathing, heavy bleeding, or thoughts of harming yourself, call 911 or go to your nearest emergency department." data-fa="پل برای شرایط اورژانسی نیست. در صورت درد قفسه‌ی سینه، تنگی نفس، خون‌ریزی شدید یا افکار آسیب به خود، با ۹۱۱ تماس بگیرید یا به نزدیک‌ترین اورژانس مراجعه کنید.">Pol is not for emergencies. If you have chest pain, trouble breathing, heavy bleeding, or thoughts of harming yourself, call 911 or go to your nearest emergency department.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== WHY ===== -->
+<section id="why">
+  <div class="wrap why-grid rv">
+    <img class="why-mark" src="assets/logo.png" alt="" aria-hidden="true">
+    <div>
+      <div class="eyebrow">
+        <svg class="star" viewBox="0 0 100 100"><use href="#shamseh"/></svg>
+        <span class="i18n" data-en="Why Pol exists" data-fa="چرا پل ساخته شد">Why Pol exists</span>
+      </div>
+
+      <p class="why-lede i18n"
+         data-en="Describing a symptom in a second language is its own kind of exhausting. You simplify. You leave out the part that seemed embarrassing. You nod when you didn't follow. For a parent who arrived later in life, it can mean skipping the appointment altogether."
+         data-fa="توضیح دادن یک نشانه‌ی بیماری به زبان دوم، خودش خسته‌کننده است. ساده‌اش می‌کنید، بخشِ خجالت‌آور را نمی‌گویید و وقتی متوجه نشده‌اید سر تکان می‌دهید. برای پدر یا مادری که در سن بالاتر مهاجرت کرده، این یعنی گاهی اصلاً به پزشک مراجعه نکردن.">
+        Describing a symptom in a second language is its own kind of exhausting. You simplify. You leave out the part that seemed embarrassing. You nod when you didn't follow. For a parent who arrived later in life, it can mean skipping the appointment altogether.
+      </p>
+      <p class="why-body i18n"
+         data-en="Pol exists so that conversation can happen in Farsi, with a specialist who understands the culture around the question as well as the question itself — and at a price that doesn't make you think twice about asking."
+         data-fa="پل ساخته شد تا این گفتگو به فارسی انجام شود، با متخصصی که نه‌فقط پرسش، بلکه بستر فرهنگی آن را هم می‌فهمد — و با هزینه‌ای که پرسیدن را برایتان دشوار نکند.">
+        Pol exists so that conversation can happen in Farsi, with a specialist who understands the culture around the question as well as the question itself — and at a price that doesn't make you think twice about asking.
+      </p>
+      <p class="why-sign i18n"
+         data-en="We're new, and we'd rather say that than invent reviews. Pol is starting with patients in Canada and a small group of doctors we've verified one by one. If you use it early, tell us what broke — we'll fix it."
+         data-fa="ما تازه شروع کرده‌ایم و ترجیح می‌دهیم همین را بگوییم تا اینکه نظر جعلی بسازیم. پل کار خود را با بیماران ساکن کانادا و گروه کوچکی از پزشکان که یک‌به‌یک بررسی شده‌اند آغاز می‌کند. اگر از همان ابتدا همراه ما باشید، هر ایرادی دیدید بگویید تا برطرفش کنیم.">
+        We're new, and we'd rather say that than invent reviews. Pol is starting with patients in Canada and a small group of doctors we've verified one by one. If you use it early, tell us what broke — we'll fix it.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section id="faq">
+  <div class="wrap">
+    <div class="section-head rv">
+      <div class="eyebrow">
+        <svg class="star" viewBox="0 0 100 100"><use href="#shamseh"/></svg>
+        <span class="i18n" data-en="Before you book" data-fa="پیش از رزرو">Before you book</span>
+      </div>
+      <h2 class="display i18n" data-en="The questions people actually ask" data-fa="پرسش‌هایی که واقعاً پرسیده می‌شود">The questions people actually ask</h2>
+    </div>
+    <div class="faq rv" id="faq-list"></div>
+  </div>
+</section>
+
+<!-- ===== FINAL CTA ===== -->
+<section id="book">
+  <div class="wrap">
+    <div class="cta-panel rv">
+      <svg class="cta-tile" aria-hidden="true"><rect width="100%" height="100%" fill="url(#tile)"/></svg>
+      <h2 class="display i18n" data-en="Ask your question in your own language" data-fa="پرسش‌تان را به زبان خودتان بپرسید">Ask your question in your own language</h2>
+      <p class="i18n" data-en="Open the chat, see which doctors are free this week, and decide from there. Looking costs nothing." data-fa="گفتگو را باز کنید، ببینید این هفته کدام پزشکان وقت خالی دارند و بعد تصمیم بگیرید. دیدنش هیچ هزینه‌ای ندارد.">Open the chat, see which doctors are free this week, and decide from there. Looking costs nothing.</p>
+      <a class="btn btn-primary tg" data-src="footer-cta" href="#" target="_blank" rel="noopener">
+        <svg class="tg" viewBox="0 0 24 24"><use href="#telegram"/></svg>
+        <span class="i18n" data-en="See available times on Telegram" data-fa="مشاهده زمان‌های در دسترس در تلگرام">See available times on Telegram</span>
+      </a>
+      <div class="cta-points">
+        <span><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><em id="price-cta" style="font-style:normal">From $30 CAD</em></span>
+        <span><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span class="i18n" data-en="Full refund over 24h before" data-fa="بازگشت کامل وجه تا ۲۴ ساعت قبل">Full refund over 24h before</span></span>
+        <span><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span class="i18n" data-en="No app to install" data-fa="بدون نصب اپلیکیشن">No app to install</span></span>
+        <span><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span class="i18n" data-en="Farsi from start to finish" data-fa="از ابتدا تا انتها به فارسی">Farsi from start to finish</span></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<a class="fab tg" data-src="float" href="#" target="_blank" rel="noopener" id="fab">
+  <svg class="tg" viewBox="0 0 24 24"><use href="#telegram"/></svg>
+  <span class="i18n" data-en="Book a visit" data-fa="رزرو نوبت">Book a visit</span>
+</a>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="wrap">
+    <div class="foot-top">
+      <a href="#top" class="logo" aria-label="Pol">
+        <img class="logo-svg" src="assets/logo.png" alt="Pol">
+        <span class="logo-tag i18n" data-en="Farsi telehealth" data-fa="ویزیت آنلاین فارسی">Farsi telehealth</span>
+      </a>
+      <div class="foot-links">
+        <a href="#how" class="i18n" data-en="How it works" data-fa="روش کار">How it works</a>
+        <a href="#specialties" class="i18n" data-en="Specialties" data-fa="تخصص‌ها">Specialties</a>
+        <a href="#doctors" class="i18n" data-en="Doctors" data-fa="پزشکان">Doctors</a>
+        <a href="#trust" class="i18n" data-en="Safety" data-fa="ایمنی">Safety</a>
+        <a href="#faq" class="i18n" data-en="FAQ" data-fa="سوالات متداول">FAQ</a>
+        <a href="#" class="i18n" data-en="Privacy" data-fa="حریم خصوصی">Privacy</a>
+      </div>
+    </div>
+    <p class="disclaimer i18n"
+       data-en="Pol is a booking and communication platform. Consultations are provided by independent physicians who are licensed in the country where they practise; they are not a substitute for in-person examination, emergency care, or care from a Canadian-licensed provider. In a medical emergency, call your local emergency number."
+       data-fa="پل یک پلتفرم رزرو و ارتباط است. ویزیت‌ها توسط پزشکان مستقلی ارائه می‌شود که در کشور محل فعالیت خود دارای مجوز هستند؛ این ویزیت‌ها جایگزین معاینه‌ی حضوری، مراقبت اورژانسی یا خدمات پزشک دارای مجوز در کانادا نیستند. در شرایط اورژانسی با شماره‌ی اورژانس محلی تماس بگیرید.">
+      Pol is a booking and communication platform.
+    </p>
+    <div class="foot-bottom">
+      <span>© 2026 <span class="i18n" data-en="Pol" data-fa="پل">Pol</span></span>
+      <span class="i18n" data-en="Currently serving patients in Canada" data-fa="در حال حاضر برای بیماران ساکن کانادا">Currently serving patients in Canada</span>
+      <a class="tg" data-src="footer-link" href="#" target="_blank" rel="noopener">@polvisitbot ↗</a>
+    </div>
+  </div>
+</footer>
+
+<div class="doc-modal" id="doc-modal" role="dialog" aria-modal="true" hidden>
+  <div class="dm-backdrop"></div>
+  <div class="dm-panel">
+    <button class="dm-close" type="button" aria-label="Close">&times;</button>
+    <div id="doc-modal-body"></div>
+  </div>
+</div>
+
+<script>
+/* ==========================================================
+   CONFIG — single source of truth (mirrors config.js)
+   ========================================================== */
+const CONFIG = {
+  brand:{en:"Pol", fa:"پل"},
+  pricing:{from:30, currency:"CAD"},
+  telegram:"polvisitbot"
+};
+
+const FA_DIGITS = ["۰","۱","۲","۳","۴","۵","۶","۷","۸","۹"];
+const fa = n => String(n).replace(/[0-9]/g, d => FA_DIGITS[d]);
+const priceLabel = l => l === "fa"
+  ? "شروع از " + fa(CONFIG.pricing.from) + " دلار کانادا"
+  : "From $" + CONFIG.pricing.from + " " + CONFIG.pricing.currency;
+const tgLink = src => "https://t.me/" + CONFIG.telegram + "?start=" + src;
+
+/* ==========================================================
+   CONTENT
+   ========================================================== */
+const SPECIALTIES = [
+  {en:"Psychiatry", fa:"روان‌پزشکی"},
+  {en:"Psychology & counselling", fa:"روان‌شناسی و مشاوره"},
+  {en:"Dermatology", fa:"پوست و مو"},
+  {en:"Endocrinology", fa:"غدد و متابولیسم"},
+  {en:"Nutrition", fa:"تغذیه"},
+  {en:"Gynecology", fa:"زنان"},
+  {en:"Internal medicine", fa:"داخلی"},
+  {en:"Gastroenterology follow-up", fa:"گوارش (پیگیری)"},
+  {en:"Urology & men's health", fa:"اورولوژی و سلامت مردان"},
+  {en:"Cardiology follow-up", fa:"قلب (پیگیری)"},
+  {en:"Pediatrics", fa:"اطفال"}
+];
+
+const DOCTORS = [
+  {
+    id:"placeholder-1", initials:"A.R.", photo:null,
+    name:{en:"Dr. Placeholder", fa:"دکتر نمونه"},
+    spec:{en:"Psychiatry", fa:"روان‌پزشکی"},
+    meta:{en:"14 years in practice · Tehran", fa:"۱۴ سال سابقه · تهران"},
+    bio:{en:"Works mostly with anxiety, low mood and sleep — the things people put off raising because explaining them in a second language is exhausting.",
+         fa:"بیشتر با اضطراب، افت خلق و مشکلات خواب کار می‌کند؛ همان مسائلی که چون توضیح‌شان به زبان دوم دشوار است، اغلب مطرح نمی‌شوند."}
+  },
+  {
+    id:"placeholder-2", initials:"S.M.", photo:null,
+    name:{en:"Dr. Placeholder", fa:"دکتر نمونه"},
+    spec:{en:"Pediatrics", fa:"اطفال"},
+    meta:{en:"9 years in practice · Isfahan", fa:"۹ سال سابقه · اصفهان"},
+    bio:{en:"Non-urgent questions about children — feeding, growth, rashes, repeated infections — answered calmly and in Farsi, with parents on the call.",
+         fa:"پرسش‌های غیراورژانسی درباره کودکان — تغذیه، رشد، ضایعات پوستی و عفونت‌های مکرر — با آرامش و به فارسی، در حضور والدین پاسخ داده می‌شود."}
+  },
+  {
+    id:"placeholder-3", initials:"N.K.", photo:null,
+    name:{en:"Dr. Placeholder", fa:"دکتر نمونه"},
+    spec:{en:"Dermatology", fa:"پوست و مو"},
+    meta:{en:"20 years in practice · Shiraz", fa:"۲۰ سال سابقه · شیراز"},
+    bio:{en:"Skin and hair concerns where a clear photo and a careful history get you most of the way to an answer — acne, hair loss, chronic eczema.",
+         fa:"مشکلات پوست و مو که با یک عکس واضح و شرح‌حال دقیق تا حد زیادی قابل بررسی‌اند: آکنه، ریزش مو و اگزمای مزمن."}
+  }
+];
+
+const FAQS = [
+  {
+    qEn:"What does a visit cost, and are there hidden fees?",
+    qFa:"هزینه‌ی ویزیت چقدر است و آیا هزینه‌ی پنهانی وجود دارد؟",
+    aEn:"Visits start at $" + CONFIG.pricing.from + " CAD. The exact fee for the doctor you choose is shown before you confirm anything, and that is the whole price — there is no membership, no booking fee and no charge for browsing.",
+    aFa:"هزینه‌ی ویزیت از " + fa(CONFIG.pricing.from) + " دلار کانادا شروع می‌شود. مبلغ دقیق پزشکی که انتخاب می‌کنید، پیش از هر تأییدی نمایش داده می‌شود و همان کل هزینه است — بدون حق عضویت، بدون کارمزد رزرو و بدون هزینه برای مشاهده."
+  },
+  {
+    qEn:"Do I need to install anything?",
+    qFa:"آیا باید نرم‌افزاری نصب کنم؟",
+    aEn:"Only Telegram, which most Farsi-speaking families already have. There's no separate account to create, no password to remember and no patient portal to log into.",
+    aFa:"فقط تلگرام، که بیشتر خانواده‌های فارسی‌زبان از قبل دارند. نه حساب جداگانه‌ای می‌سازید، نه رمزی به خاطر می‌سپارید و نه وارد پرتال بیمار می‌شوید."
+  },
+  {
+    qEn:"Can I book for my mother or father instead of myself?",
+    qFa:"آیا می‌توانم به‌جای خودم برای پدر یا مادرم نوبت بگیرم؟",
+    aEn:"Yes, and many people do. You can book the time, pay, and sit in on the visit — or just hand over the link. Nothing about the file is shared with a family member unless the patient asks for it.",
+    aFa:"بله، و بسیاری همین کار را می‌کنند. می‌توانید زمان را رزرو کنید، پرداخت کنید و در ویزیت حاضر باشید، یا فقط لینک را به ایشان بدهید. هیچ بخشی از پرونده بدون درخواست خودِ بیمار با اعضای خانواده در میان گذاشته نمی‌شود."
+  },
+  {
+    qEn:"What if I need to cancel, or the doctor doesn't show up?",
+    qFa:"اگر بخواهم لغو کنم یا پزشک حاضر نشود چه می‌شود؟",
+    aEn:"Cancel more than 24 hours ahead and you get 100% back. Inside 24 hours, half is refunded. If the doctor misses the visit, you're refunded in full and we help you rebook.",
+    aFa:"اگر بیش از ۲۴ ساعت پیش از نوبت لغو کنید، صد درصد مبلغ بازگردانده می‌شود و در کمتر از ۲۴ ساعت، نیمی از آن. اگر پزشک در ویزیت حاضر نشود، تمام مبلغ بازگردانده می‌شود و در رزرو مجدد کمک‌تان می‌کنیم."
+  },
+  {
+    qEn:"Who can see what I say during the visit?",
+    qFa:"چه کسانی می‌توانند گفته‌های من در ویزیت را ببینند؟",
+    aEn:"Your doctor, and the small team that confirms bookings and payments. We don't sell information to anyone, and we don't use your medical details for advertising.",
+    aFa:"پزشک شما و تیم کوچکی که رزروها و پرداخت‌ها را تأیید می‌کند. ما اطلاعات را به هیچ‌کس نمی‌فروشیم و از جزئیات پزشکی شما برای تبلیغات استفاده نمی‌کنیم."
+  }
+];
+
+/* ==========================================================
+   i18n
+   ========================================================== */
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+
+const I18N = {
+  get(){ return document.documentElement.lang === "fa" ? "fa" : "en"; },
+  set(lang){
+    const l = lang === "fa" ? "fa" : "en";
+    document.documentElement.lang = l;
+    document.documentElement.dir = l === "fa" ? "rtl" : "ltr";
+    document.querySelectorAll(".i18n").forEach(el=>{
+      const v = el.getAttribute("data-" + l);
+      if (v != null) el.innerHTML = v;
+    });
+    document.querySelectorAll(".lang button").forEach(b=>{
+      b.classList.toggle("on", b.dataset.lang === l);
+    });
+    document.getElementById("price-hero").textContent = priceLabel(l);
+    document.getElementById("price-cta").textContent = priceLabel(l);
+    document.title = l === "fa"
+      ? CONFIG.brand.fa + " — ویزیت آنلاین با پزشکان فارسی‌زبان"
+      : CONFIG.brand.en + " — Persian-language telehealth";
+    try { localStorage.setItem("pol_lang", l); } catch(e){}
+  }
+};
+
+/* ---- Specialties ---- */
+document.getElementById("spec-list").innerHTML = SPECIALTIES.map(s =>
+  '<span class="spec">' +
+    '<svg class="star" viewBox="0 0 100 100"><use href="#shamseh"/></svg>' +
+    '<span class="i18n" data-en="' + esc(s.en) + '" data-fa="' + esc(s.fa) + '">' + esc(s.en) + '</span>' +
+  '</span>'
+).join("");
+
+/* ---- Doctors ---- */
+document.getElementById("doctor-grid").innerHTML = DOCTORS.map(function(d){
+  const portrait = d.photo
+    ? '<img src="' + esc(d.photo) + '" alt="">'
+    : '<div class="doc-initials">' + esc(d.initials) + '</div>';
+  return '<button class="doc-card" type="button" data-doc="' + esc(d.id) + '">' +
+    '<div class="doc-photo">' + portrait + '</div>' +
+    '<div class="doc-info">' +
+      '<h3 class="i18n" data-en="' + esc(d.name.en) + '" data-fa="' + esc(d.name.fa) + '">' + esc(d.name.en) + '</h3>' +
+      '<div class="spec-line i18n" data-en="' + esc(d.spec.en) + '" data-fa="' + esc(d.spec.fa) + '">' + esc(d.spec.en) + '</div>' +
+      '<p class="doc-bio i18n" data-en="' + esc(d.bio.en) + '" data-fa="' + esc(d.bio.fa) + '">' + esc(d.bio.en) + '</p>' +
+      '<div class="doc-meta i18n" data-en="' + esc(d.meta.en) + '" data-fa="' + esc(d.meta.fa) + '">' + esc(d.meta.en) + '</div>' +
+      '<div class="doc-cta">' +
+        '<span class="ph-chip i18n" data-en="Placeholder photo" data-fa="عکس نمونه">Placeholder photo</span>' +
+        '<span class="doc-link">' +
+          '<span class="i18n" data-en="View profile" data-fa="مشاهده پروفایل">View profile</span>' +
+          '<span class="arw">&rarr;</span>' +
+        '</span>' +
+      '</div>' +
+    '</div>' +
+  '</button>';
+}).join("");
+
+/* ---- Doctor detail modal ---- */
+const modal      = document.getElementById("doc-modal");
+const modalBody  = document.getElementById("doc-modal-body");
+let lastFocused  = null;
+
+function blankBlock(labelEn, labelFa){
+  return '<div class="dm-block">' +
+    '<h4 class="i18n" data-en="' + labelEn + '" data-fa="' + labelFa + '">' + labelEn + '</h4>' +
+    '<div class="dm-blank"><span class="i18n" data-en="To be added" data-fa="به‌زودی تکمیل می‌شود">To be added</span></div>' +
+  '</div>';
+}
+
+function openDoctor(id){
+  const d = DOCTORS.find(x => x.id === id);
+  if (!d) return;
+  lastFocused = document.activeElement;
+
+  modalBody.innerHTML =
+    '<div class="dm-head">' +
+      '<div class="dm-portrait">' +
+        (d.photo ? '<img src="' + esc(d.photo) + '" alt="">'
+                 : '<div class="doc-initials">' + esc(d.initials) + '</div>') +
+      '</div>' +
+      '<div>' +
+        '<h3 class="i18n" data-en="' + esc(d.name.en) + '" data-fa="' + esc(d.name.fa) + '">' + esc(d.name.en) + '</h3>' +
+        '<div class="spec-line i18n" data-en="' + esc(d.spec.en) + '" data-fa="' + esc(d.spec.fa) + '">' + esc(d.spec.en) + '</div>' +
+        '<div class="dm-meta i18n" data-en="' + esc(d.meta.en) + '" data-fa="' + esc(d.meta.fa) + '">' + esc(d.meta.en) + '</div>' +
+        '<span class="ph-chip i18n" data-en="Placeholder profile" data-fa="پروفایل نمونه">Placeholder profile</span>' +
+      '</div>' +
+    '</div>' +
+    '<p class="dm-bio i18n" data-en="' + esc(d.bio.en) + '" data-fa="' + esc(d.bio.fa) + '">' + esc(d.bio.en) + '</p>' +
+    blankBlock("Training &amp; credentials", "تحصیلات و مدارک") +
+    blankBlock("Commonly helps with", "موارد رایج درمان") +
+    blankBlock("Languages", "زبان‌ها") +
+    blankBlock("Availability", "زمان‌های در دسترس") +
+    '<div class="dm-foot">' +
+      '<a class="btn btn-primary tg" href="' + tgLink("doc-" + esc(d.id)) + '" target="_blank" rel="noopener">' +
+        '<svg class="tg" viewBox="0 0 24 24"><use href="#telegram"/></svg>' +
+        '<span class="i18n" data-en="Book with this doctor" data-fa="رزرو با این پزشک">Book with this doctor</span>' +
+      '</a>' +
+      '<span class="dm-note i18n" data-en="Full profile coming at launch." data-fa="پروفایل کامل هنگام راه‌اندازی منتشر می‌شود.">Full profile coming at launch.</span>' +
+    '</div>';
+
+  I18N.set(I18N.get());
+  modal.hidden = false;
+  document.body.style.overflow = "hidden";
+  modal.querySelector(".dm-close").focus();
+}
+
+function closeDoctor(){
+  modal.hidden = true;
+  document.body.style.overflow = "";
+  if (lastFocused) lastFocused.focus();
+}
+
+document.getElementById("doctor-grid").addEventListener("click", e => {
+  const card = e.target.closest("[data-doc]");
+  if (card) openDoctor(card.dataset.doc);
+});
+modal.addEventListener("click", e => {
+  if (e.target.matches(".dm-backdrop, .dm-close, .dm-close *")) closeDoctor();
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && !modal.hidden) closeDoctor();
+});
+
+/* ---- FAQ ---- */
+document.getElementById("faq-list").innerHTML = FAQS.map(f =>
+  "<details>" +
+    "<summary>" +
+      '<span class="i18n" data-en="' + esc(f.qEn) + '" data-fa="' + esc(f.qFa) + '">' + esc(f.qEn) + "</span>" +
+      '<span class="pm" aria-hidden="true"></span>' +
+    "</summary>" +
+    '<div class="ans-wrap"><div class="ans i18n" data-en="' + esc(f.aEn) + '" data-fa="' + esc(f.aFa) + '">' + esc(f.aEn) + "</div></div>" +
+  "</details>"
+).join("");
+
+
+/* ---- Stagger delays inside revealed blocks ---- */
+document.querySelectorAll(".stagger").forEach(box=>{
+  [...box.children].filter(c => !c.classList.contains("steps-arc"))
+    .forEach((c,i) => c.style.transitionDelay = (i * 70) + "ms");
+});
+
+/* ---- FAQ: animate open/close instead of snapping ---- */
+document.querySelectorAll(".faq details").forEach(d=>{
+  const wrap = d.querySelector(".ans-wrap");
+  d.querySelector("summary").addEventListener("click", ev=>{
+    ev.preventDefault();
+    if (d.open){
+      wrap.classList.remove("open");
+      wrap.addEventListener("transitionend", () => { d.open = false; }, {once:true});
+    } else {
+      d.open = true;
+      requestAnimationFrame(() => wrap.classList.add("open"));
+    }
+  });
+});
+
+/* ---- Telegram links: tag each entry point so bookings can be attributed ---- */
+document.querySelectorAll("a.tg").forEach(a => a.href = tgLink(a.dataset.src || "web"));
+
+/* ---- Floating book button appears once the hero scrolls past ---- */
+(function(){
+  const fab  = document.getElementById("fab");
+  const hero = document.querySelector(".hero");
+  const cta  = document.getElementById("book");
+  const check = () => {
+    const heroGone = hero.getBoundingClientRect().bottom < 0;
+    const atCta    = cta.getBoundingClientRect().top < window.innerHeight * .85;
+    fab.classList.toggle("show", heroGone && !atCta);
+  };
+  check();
+  window.addEventListener("scroll", check, {passive:true});
+  window.addEventListener("resize", check);
+})();
+
+/* ---- Language boot ---- */
+let start = "en";
+try {
+  const param = new URLSearchParams(location.search).get("lang");
+  const saved = localStorage.getItem("pol_lang");
+  if (param) start = param === "fa" ? "fa" : "en";
+  else if (saved) start = saved === "fa" ? "fa" : "en";
+  else if ((navigator.language || "").toLowerCase().startsWith("fa")) start = "fa";
+} catch(e){}
+I18N.set(start);
+
+document.querySelectorAll(".lang button").forEach(b=>{
+  b.addEventListener("click", () => I18N.set(b.dataset.lang));
+});
+
+
+/* ---- Respect reduced motion for the SVG pattern drift ---- */
+try{
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+    const t = document.getElementById("tiledrift");
+    if (t) t.remove();
+  }
+}catch(e){}
+
+/* ---- Nav background on scroll ---- */
+const nav = document.getElementById("nav");
+const onScroll = () => nav.classList.toggle("stuck", window.scrollY > 40);
+onScroll();
+window.addEventListener("scroll", onScroll, {passive:true});
+
+/* ---- Reveal ---- */
+const io = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } });
+}, {threshold:.12, rootMargin:"0px 0px -40px"});
+document.querySelectorAll(".rv").forEach(el => io.observe(el));
+</script>
+</body>
+</html>
