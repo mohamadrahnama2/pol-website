@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Health Tools — Pol</title>
+<meta name="description" content="Free, anonymous health tools from Pol — no login, no data stored.">
+<link rel="canonical" href="https://polvisit.com/tools/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Vazirmatn:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================
+   POL — shared design tokens (mirrors polvisit.com)
+   ========================================================== */
+:root{
+  --pine:#22523C; --pine-deep:#16382A;
+  --sage:#7FBE9C; --sage-deep:#3E7355; --sage-soft:rgba(62,115,85,.12);
+  --gold:#D6A63C; --gold-bright:#E4B854; --gold-soft:rgba(214,166,60,.16);
+  --paper:#F4ECDB; --paper-deep:#EADFC5; --paper-line:rgba(22,56,42,.14);
+  --ink:#1E2B22; --ink-70:rgba(30,43,34,.74); --ink-45:rgba(30,43,34,.5);
+  --cream:#F6F0E2;
+  --r-sm:10px; --r-md:16px; --r-lg:26px; --maxw:1140px;
+  --shadow-card:0 12px 30px -20px rgba(16,45,32,.38);
+  --display:"Instrument Serif","Vazirmatn",Georgia,serif;
+  --body:"Vazirmatn",system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box;}
+body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--body); font-size:16.5px; line-height:1.65; -webkit-font-smoothing:antialiased;}
+a{color:inherit;} img{display:block; max-width:100%;}
+.wrap{max-width:var(--maxw); margin:0 auto; padding-inline:26px;}
+.display{font-family:var(--display); font-weight:400; letter-spacing:-.015em; line-height:1.1;}
+[dir="rtl"] .display{font-family:var(--body); font-weight:800; letter-spacing:0; line-height:1.45;}
+
+.nav{position:sticky; top:0; z-index:60; background:rgba(244,236,219,.95); backdrop-filter:blur(12px); border-bottom:1px solid var(--paper-line);}
+.nav-inner{max-width:var(--maxw); margin:0 auto; padding:15px 26px; display:flex; align-items:center; justify-content:space-between; gap:20px;}
+.logo{display:inline-flex; flex-direction:column; align-items:flex-start; gap:1px; text-decoration:none; color:var(--ink); line-height:1;}
+.logo-svg{height:41px; width:auto; display:block;}
+.logo-tag{font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--sage-deep); font-weight:700;}
+[dir="rtl"] .logo-tag{letter-spacing:0; text-transform:none; font-size:12.5px;}
+.lang{display:flex; border-radius:999px; overflow:hidden; border:1.5px solid var(--paper-line);}
+.lang button{font-family:var(--body); font-size:12.5px; font-weight:700; padding:7px 12px; border:0; background:transparent; color:var(--ink-45); cursor:pointer;}
+.lang button.on{background:var(--pine); color:var(--cream);}
+
+.hero{padding:64px 0 20px;}
+.eyebrow{display:inline-flex; align-items:center; gap:9px; font-size:15px; font-weight:700; letter-spacing:.13em; text-transform:uppercase; color:var(--sage-deep); margin-bottom:16px;}
+[dir="rtl"] .eyebrow{letter-spacing:0; text-transform:none; font-size:18px; font-weight:800;}
+.eyebrow .star{width:14px; height:14px; fill:var(--gold); flex:none;}
+h1{font-size:clamp(32px,4.2vw,46px); margin-bottom:14px;}
+[dir="rtl"] h1{font-size:clamp(26px,3.4vw,34px);}
+.hero p{color:var(--ink-70); font-size:17px; max-width:60ch; margin:0;}
+
+.grid{padding:36px 0 90px; display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:24px;}
+.tool-card{
+  display:flex; flex-direction:column; text-decoration:none; color:inherit;
+  background:var(--cream); border:1px solid var(--paper-line); border-radius:var(--r-lg);
+  padding:26px 24px; transition:transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+.tool-card:hover{transform:translateY(-3px); border-color:var(--sage-deep); box-shadow:var(--shadow-card);}
+.tool-icon{
+  width:48px; height:48px; border-radius:14px; background:var(--gold-soft);
+  display:grid; place-items:center; margin-bottom:18px;
+}
+.tool-icon svg{width:23px; height:23px; stroke:var(--pine); fill:none; stroke-width:1.8;}
+.tool-card h3{font-size:19px; font-weight:700; margin-bottom:8px;}
+.tool-card p{font-size:14.5px; color:var(--ink-70); margin:0 0 18px; flex:1;}
+.tool-open{display:inline-flex; align-items:center; gap:7px; font-size:14px; font-weight:700; color:var(--sage-deep);}
+.tool-open .arw{transition:transform .18s ease;}
+.tool-card:hover .tool-open .arw{transform:translateX(4px);}
+[dir="rtl"] .tool-open .arw{transform:scaleX(-1);}
+[dir="rtl"] .tool-card:hover .tool-open .arw{transform:scaleX(-1) translateX(4px);}
+
+.soon-card{
+  border:1.5px dashed var(--paper-line); border-radius:var(--r-lg); padding:26px 24px;
+  display:flex; flex-direction:column; justify-content:center; color:var(--ink-45); text-align:center; min-height:180px;
+}
+.soon-card span{font-size:14px; font-weight:600;}
+
+footer{padding:30px 0 40px; border-top:1px solid var(--paper-line); text-align:center;}
+footer a{font-size:14px; font-weight:700; color:var(--sage-deep); text-decoration:none;}
+footer p{font-size:13px; color:var(--ink-45); margin:10px 0 0;}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="shamseh" viewBox="0 0 100 100"><path d="M50 1 L61.5 24.5 L86.5 14 L76 39 L99 50 L76 61 L86.5 86 L61.5 75.5 L50 99 L38.5 75.5 L13.5 86 L24 61 L1 50 L24 39 L13.5 14 L38.5 24.5 Z"/></symbol>
+  <symbol id="ico-drop" viewBox="0 0 24 24"><path d="M12 2C8 8 5 12 5 15.5a7 7 0 0014 0C19 12 16 8 12 2z"/></symbol>
+</svg>
+
+<header class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="../" class="logo" aria-label="Pol">
+      <img class="logo-svg" src="../assets/logo.png" alt="Pol">
+      <span class="logo-tag i18n" data-en="Farsi telehealth" data-fa="ویزیت آنلاین فارسی">Farsi telehealth</span>
+    </a>
+    <div class="lang" role="group" aria-label="Language">
+      <button data-lang="en" class="on">EN</button>
+      <button data-lang="fa">فارسی</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <div class="eyebrow">
+        <svg class="star" viewBox="0 0 100 100"><use href="#shamseh"/></svg>
+        <span class="i18n" data-en="Free & anonymous" data-fa="رایگان و ناشناس">Free & anonymous</span>
+      </div>
+      <h1 class="display i18n" data-en="Health Tools" data-fa="ابزارهای سلامت">Health Tools</h1>
+      <p class="i18n" data-en="Quick, standalone calculators from Pol — no login, no data saved. Just answer a few questions in your own language." data-fa="ابزارهای محاسباتی سریع و مستقل از پل — بدون ورود به حساب، بدون ذخیره اطلاعات. فقط به چند سؤال به زبان خودتان پاسخ دهید.">Quick, standalone calculators from Pol — no login, no data saved. Just answer a few questions in your own language.</p>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="grid" id="tool-grid"></div>
+  </section>
+</main>
+
+<footer>
+  <a class="i18n" data-en="← Back to Pol" data-fa="→ بازگشت به پل" href="../"></a>
+  <p class="i18n" data-en="These tools give general estimates only and are not a substitute for medical advice." data-fa="این ابزارها فقط تخمین کلی ارائه می‌دهند و جایگزین مشاوره پزشکی نیستند.">These tools give general estimates only and are not a substitute for medical advice.</p>
+</footer>
+
+<script>
+/* ==========================================================
+   Tool registry — add a new object here for each future tool.
+   Nothing else on this page needs to change.
+   ========================================================== */
+const TOOLS = [
+  {
+    href:"vitamin-d/",
+    icon:"ico-drop",
+    name:{en:"Vitamin D Calculator", fa:"محاسبه‌گر ویتامین D"},
+    desc:{en:"Get a personalized daily vitamin D3 target based on your age, weight, location and sun exposure.", fa:"با توجه به سن، وزن، محل زندگی و میزان قرارگیری در معرض نور خورشید، هدف روزانه ویتامین D3 خود را دریافت کنید."}
+  }
+  // Next tool goes here, e.g.:
+  // { href:"bmi/", icon:"ico-scale", name:{en:"BMI Calculator", fa:"..."}, desc:{en:"...", fa:"..."} }
+];
+
+const SOON_SLOTS = 2; // placeholder cards hinting more tools are coming
+
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+const I18N = {
+  lang:"en",
+  set(lang){
+    this.lang = lang === "fa" ? "fa" : "en";
+    document.documentElement.lang = this.lang;
+    document.documentElement.dir = this.lang === "fa" ? "rtl" : "ltr";
+    document.querySelectorAll(".i18n").forEach(el=>{
+      const v = el.getAttribute("data-" + this.lang);
+      if (v != null) el.textContent = v;
+    });
+    document.querySelectorAll(".lang button").forEach(b=>b.classList.toggle("on", b.dataset.lang===this.lang));
+    document.title = this.lang === "fa" ? "ابزارهای سلامت — پل" : "Health Tools — Pol";
+    renderGrid();
+  }
+};
+
+function renderGrid(){
+  const l = I18N.lang;
+  const cards = TOOLS.map(tool => (
+    '<a class="tool-card" href="' + esc(tool.href) + '">' +
+      '<div class="tool-icon"><svg viewBox="0 0 24 24"><use href="#' + tool.icon + '"/></svg></div>' +
+      '<h3>' + esc(tool.name[l]) + '</h3>' +
+      '<p>' + esc(tool.desc[l]) + '</p>' +
+      '<span class="tool-open"><span>' + (l==="fa"?"باز کردن":"Open") + '</span><span class="arw">&rarr;</span></span>' +
+    '</a>'
+  )).join("");
+
+  const soon = Array.from({length:SOON_SLOTS}).map(()=>(
+    '<div class="soon-card"><span>' + (l==="fa"?"ابزار بعدی، به‌زودی":"More tools coming soon") + '</span></div>'
+  )).join("");
+
+  document.getElementById("tool-grid").innerHTML = cards + soon;
+}
+
+document.querySelectorAll(".lang button").forEach(b=>{
+  b.addEventListener("click", ()=> I18N.set(b.dataset.lang));
+});
+I18N.set("en");
+</script>
+</body>
+</html>
